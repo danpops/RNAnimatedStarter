@@ -13,7 +13,7 @@ import Animated, {
   WithTimingConfig,
 } from 'react-native-reanimated';
 import {Colors} from './src/lib/colors';
-import TSIcon from './src/TSIcon/TSIcon';
+import TSIcon from './src/components/TSIcon';
 
 const SIZE = 200.0;
 
