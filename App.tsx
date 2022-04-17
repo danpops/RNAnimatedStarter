@@ -3,6 +3,7 @@ import {StyleSheet, Switch} from 'react-native';
 import Animated, {
   Easing,
   interpolateColor,
+  useAnimatedProps,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -11,38 +12,47 @@ import Animated, {
   withTiming,
   WithTimingConfig,
 } from 'react-native-reanimated';
-import TSIcon from './src/assets/ts-icon.svg';
+import {Colors} from './src/lib/colors';
+import TSIcon from './src/TSIcon/TSIcon';
 
 const SIZE = 200.0;
-const LOGO_SIZE = SIZE - 80.0;
-
-enum Colors {
-  yellow = '#FBEB4F',
-  light = '#E8E8E8',
-  dark = '#1E1E1E',
-}
 
 const timingOptions: WithTimingConfig = {duration: 600, easing: Easing.ease};
+
+type InterpolateColorProps = {
+  colorStyle: Animated.SharedValue<0 | 1>;
+  primary: Colors;
+  secondary: Colors;
+};
+
+const interpolateColorOptions = ({
+  colorStyle,
+  primary,
+  secondary,
+}: InterpolateColorProps) => {
+  'worklet';
+
+  return interpolateColor(colorStyle.value, [0, 1], [primary, secondary]);
+};
 
 export default function App() {
   const [isActive, setActive] = useState<boolean>(false);
 
-  const scale = useSharedValue(0);
+  const scale = useSharedValue(1);
   const progress = useSharedValue(1);
-  const opacity = useSharedValue(0);
+  const opacity = useSharedValue(0.2);
 
   const colorStyle = useDerivedValue(() => {
-    return isActive
-      ? withTiming(1, timingOptions)
-      : withTiming(0, timingOptions);
+    const colorTiming = isActive ? 1 : 0;
+    return withTiming(colorTiming, timingOptions);
   });
 
   const animatedSquare = useAnimatedStyle(() => {
-    const backgroundColor = interpolateColor(
-      colorStyle.value,
-      [0, 1],
-      [Colors.light, Colors.yellow],
-    );
+    const backgroundColor = interpolateColorOptions({
+      colorStyle,
+      primary: Colors.gold,
+      secondary: Colors.yellow,
+    });
 
     return {
       backgroundColor,
@@ -55,19 +65,37 @@ export default function App() {
     };
   });
 
+  const animatedProps = useAnimatedProps(() => {
+    const fill = interpolateColorOptions({
+      colorStyle,
+      primary: Colors.yellow,
+      secondary: Colors.dark,
+    });
+
+    return {
+      fill,
+    };
+  });
+
   const animatedBackground = useAnimatedStyle(() => {
-    const backgroundColor = interpolateColor(
-      colorStyle.value,
-      [0, 1],
-      [Colors.dark, Colors.light],
-    );
-    return {backgroundColor};
+    const backgroundColor = interpolateColorOptions({
+      colorStyle,
+      primary: Colors.dark,
+      secondary: Colors.light,
+    });
+    return {
+      backgroundColor,
+    };
   });
 
   const toggleTheme = () => {
     setActive(!isActive);
+
+    const progressTiming = isActive ? 1 : 0.5;
+    const opacityTiming = isActive ? 0.2 : 1;
+
     scale.value = isActive
-      ? withTiming(0, timingOptions)
+      ? withTiming(1, timingOptions)
       : withRepeat(
           withSequence(
             withTiming(1.3, timingOptions),
@@ -76,18 +104,14 @@ export default function App() {
           -1,
           true,
         );
-    progress.value = isActive
-      ? withTiming(1, timingOptions)
-      : withTiming(0.5, timingOptions);
-    opacity.value = isActive
-      ? withTiming(0, timingOptions)
-      : withTiming(1, timingOptions);
+    progress.value = withTiming(progressTiming, timingOptions);
+    opacity.value = withTiming(opacityTiming, timingOptions);
   };
 
   return (
     <Animated.View style={[styles.container, animatedBackground]}>
       <Animated.View style={[styles.square, animatedSquare]}>
-        <TSIcon width={LOGO_SIZE} height={LOGO_SIZE} fill={Colors.dark} />
+        <TSIcon animatedProps={animatedProps} />
       </Animated.View>
       <Switch
         style={styles.switch}
