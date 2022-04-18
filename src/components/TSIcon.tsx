@@ -12,7 +12,7 @@ M14.2649 101.736H57.9999V58.0004H14.2649V101.736ZM0 115.364H72.2639V43.0996H0V11
 `;
 
 const TSIcon: FC<Partial<Animated.AnimateProps<PathProps>> | undefined> = ({
-  animatedProps,
+  animatedProps = {},
 }) => {
   return (
     <Svg width={SIZE} height={SIZE} viewBox={VIEW_BOX}>
