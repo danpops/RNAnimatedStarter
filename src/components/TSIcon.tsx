@@ -1,6 +1,7 @@
 import React, {FC} from 'react';
 import Animated from 'react-native-reanimated';
 import Svg, {Path, PathProps} from 'react-native-svg';
+import {Colors} from '../lib/colors';
 
 const AnimatedTSIcon = Animated.createAnimatedComponent(Path);
 
@@ -20,6 +21,7 @@ const TSIcon: FC<Partial<Animated.AnimateProps<PathProps>> | undefined> = ({
         animatedProps={animatedProps}
         d={PATH}
         fillRule="evenodd"
+        fill={Colors.dark}
       />
     </Svg>
   );
