@@ -8,16 +8,14 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
   withRepeat,
-  withSequence,
   withTiming,
   WithTimingConfig,
 } from 'react-native-reanimated';
 import {Colors} from './src/lib/colors';
 import TSIcon from './src/components/TSIcon';
 
-const SIZE = 200.0;
-
-const timingOptions: WithTimingConfig = {duration: 600, easing: Easing.ease};
+const SQUARE_SIZE = 200.0;
+const TIMING_OPTIONS: WithTimingConfig = {duration: 600, easing: Easing.ease};
 
 type InterpolateColorProps = {
   colorStyle: Animated.SharedValue<0 | 1>;
@@ -44,19 +42,19 @@ export default function App() {
 
   const colorStyle = useDerivedValue(() => {
     const colorTiming = isActive ? 1 : 0;
-    return withTiming(colorTiming, timingOptions);
+    return withTiming(colorTiming, TIMING_OPTIONS);
   });
 
   const animatedSquare = useAnimatedStyle(() => {
     const backgroundColor = interpolateColorOptions({
       colorStyle,
-      primary: Colors.gold,
+      primary: Colors.dark,
       secondary: Colors.yellow,
     });
 
     return {
       backgroundColor,
-      borderRadius: (progress.value * SIZE) / 2,
+      borderRadius: (progress.value * SQUARE_SIZE) / 2,
       opacity: opacity.value,
       transform: [
         {scale: scale.value},
@@ -95,17 +93,10 @@ export default function App() {
     const opacityTiming = isActive ? 0.2 : 1;
 
     scale.value = isActive
-      ? withTiming(1, timingOptions)
-      : withRepeat(
-          withSequence(
-            withTiming(1.3, timingOptions),
-            withTiming(1, timingOptions),
-          ),
-          -1,
-          true,
-        );
-    progress.value = withTiming(progressTiming, timingOptions);
-    opacity.value = withTiming(opacityTiming, timingOptions);
+      ? withTiming(1, TIMING_OPTIONS)
+      : withRepeat(withTiming(1.3, TIMING_OPTIONS), -1, true);
+    progress.value = withTiming(progressTiming, TIMING_OPTIONS);
+    opacity.value = withTiming(opacityTiming, TIMING_OPTIONS);
   };
 
   return (
@@ -130,8 +121,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light,
   },
   square: {
-    width: SIZE,
-    height: SIZE,
+    width: SQUARE_SIZE,
+    height: SQUARE_SIZE,
     backgroundColor: Colors.yellow,
     alignItems: 'center',
     justifyContent: 'center',
